@@ -120,7 +120,7 @@ noText.Rotation = -2
 local noScale = Instance.new("UIScale", noText)
 noScale.Scale = 1.22
 
-local sureGlow = makeCenterText("SureGlow", "RIVAL HUB", 90, Enum.Font.GothamBlack, Color3.fromRGB(35,105,255), 14)
+local sureGlow = makeCenterText("SureGlow", "Anciote", 90, Enum.Font.GothamBlack, Color3.fromRGB(35,105,255), 14)
 local sureStroke = Instance.new("UIStroke", sureGlow)
 sureStroke.Color = Color3.fromRGB(20,85,220)
 sureStroke.Thickness = 10
@@ -505,8 +505,8 @@ end
 if _G.ancioteRunning then
     warn("[anciote] Instancia previa detectada. Se recomienda rejoin si hay comportamiento errático.")
 end
-_G.RivalHubRunning = false
-_G.__RivalHubMainOriginalPos = nil
+_G.AncioteRunning = false
+_G.__AncioteMainOriginalPos = nil
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -526,7 +526,7 @@ if not LP then
     if _lpConn then _lpConn:Disconnect() end
 end
 if not LP then
-    warn("[Rival Hub] LocalPlayer no disponible en 15s. Abortando.")
+    warn("[Anciote] LocalPlayer no disponible en 15s. Abortando.")
     return
 end
 
@@ -539,8 +539,8 @@ end
 local camera = Workspace.CurrentCamera
 
 _G.ancioteRunning = true
-_G.ancioteSession = (_G.RivalHubSession or 0) + 1
-local _mySession = _G.RivalHubSession
+_G.ancioteSession = (_G.AncioteSession or 0) + 1
+local _mySession = _G.AncioteSession
 
 local anciote_LANGUAGE = "en"
 
@@ -565,7 +565,7 @@ local function localizeancioteInterface(root)
 end
 
 local function ancioteTranslate(source)
-    local dictionary = RIVALHUB_TRANSLATIONS[anciote_LANGUAGE]
+    local dictionary = Anciote_TRANSLATIONS[anciote_LANGUAGE]
     return (dictionary and dictionary[source]) or source
 end
 
@@ -616,7 +616,7 @@ local State = {
     bypassBatEnabled = false,
     bypassBatSpeed = BYPASS_AIMBOT_SPEED,
 }
-CONFIG_FILE = "RivalHub_" .. tostring(LP.UserId) .. ".json"
+CONFIG_FILE = "Anciote_" .. tostring(LP.UserId) .. ".json"
 BAT_V2_HIT_DIST = 4.5
 _isDraggingButton = false
 
@@ -675,21 +675,21 @@ local COLOR_THEMES = {
     ["Gray"] = Color3.fromRGB(170, 170, 170),
 }
 
-RIVAL_TITLE_THEMES = {
+Anciote_TITLE_THEMES = {
     ["Blue"]  = { top = Color3.fromRGB(60, 130, 255),  bottom = Color3.fromRGB(210, 220, 235) },
     ["Red"]   = { top = Color3.fromRGB(255, 70, 70),   bottom = Color3.fromRGB(215, 215, 215) },
     ["Green"] = { top = Color3.fromRGB(50, 220, 110),  bottom = Color3.fromRGB(200, 240, 210) },
     ["Black"] = { top = Color3.fromRGB(35, 35, 40),    bottom = Color3.fromRGB(115, 115, 125) },
     ["Gray"]  = { top = Color3.fromRGB(200, 200, 200), bottom = Color3.fromRGB(120, 120, 130) },
 }
-currentRivalTitleTheme = "Blue"
+currentAncioteTitleTheme = "Blue"
 scriptLogoRef = nil
-rivalTitleSelectorLabel = nil
+AncioteTitleSelectorLabel = nil
 
-function applyRivalTitleTheme(themeName)
-    local t = RIVAL_TITLE_THEMES[themeName]
+function applyAncioteTitleTheme(themeName)
+    local t = Anciote_TITLE_THEMES[themeName]
     if not t then return end
-    currentRivalTitleTheme = themeName
+    currentAncioteTitleTheme = themeName
     if scriptLogoRef then
         local grad = scriptLogoRef:FindFirstChildOfClass("UIGradient")
         if grad then
@@ -699,8 +699,8 @@ function applyRivalTitleTheme(themeName)
             })
         end
     end
-    if rivalTitleSelectorLabel then
-        rivalTitleSelectorLabel.Text = themeName
+    if AncioteTitleSelectorLabel then
+        AncioteTitleSelectorLabel.Text = themeName
     end
     if saveAllSettings then pcall(saveAllSettings) end
 end
@@ -710,7 +710,7 @@ selectedColor = COLOR_THEMES["Gray"]
 
 function getThemeColor() return selectedColor end
 
-function rivalHubGradient(c)
+function AncioteGradient(c)
     return ColorSequence.new({
         ColorSequenceKeypoint.new(0.00, c:Lerp(Color3.new(1,1,1), 0.55)),
         ColorSequenceKeypoint.new(0.45, c),
@@ -718,7 +718,7 @@ function rivalHubGradient(c)
     })
 end
 
-function rivalHubGradientSoft(c)
+function AncioteGradientSoft(c)
     return ColorSequence.new({
         ColorSequenceKeypoint.new(0.00, c:Lerp(Color3.new(1,1,1), 0.75)),
         ColorSequenceKeypoint.new(0.50, c:Lerp(Color3.new(1,1,1), 0.25)),
@@ -726,7 +726,7 @@ function rivalHubGradientSoft(c)
     })
 end
 
-function rivalHubGradientDark(c)
+function AncioteGradientDark(c)
     return ColorSequence.new({
         ColorSequenceKeypoint.new(0.00, c:Lerp(Color3.fromRGB(0,0,0), 0.35)),
         ColorSequenceKeypoint.new(0.55, c:Lerp(Color3.fromRGB(0,0,0), 0.65)),
@@ -734,14 +734,14 @@ function rivalHubGradientDark(c)
     })
 end
 
-function applyRivalHubGradientToLabel(label, c)
+function applyAncioteGradientToLabel(label, c)
     if not label then return end
     local grad = label:FindFirstChildOfClass("UIGradient")
     if not grad then
         grad = Instance.new("UIGradient", label)
     end
     grad.Rotation = 0
-    grad.Color = rivalHubGradient(c)
+    grad.Color = AncioteGradient(c)
 end
 
 local _lastThemeUpdate = 0
@@ -771,7 +771,7 @@ function updateAllUIThemeColors(color)
         progressFill.BackgroundColor3 = color
         local grad = progressFill:FindFirstChildOfClass("UIGradient")
         if grad then
-            grad.Color = rivalHubGradient(color)
+            grad.Color = AncioteGradient(color)
             grad.Rotation = 0
         end
     end
@@ -836,7 +836,7 @@ function updateAllUIThemeColors(color)
             tab.BackgroundColor3 = color
             tab.BackgroundTransparency = 0.15
             local tg = tab:FindFirstChild("TabBgGrad")
-            if tg then tg.Color = rivalHubGradient(color) end
+            if tg then tg.Color = AncioteGradient(color) end
         else
             tab.TextColor3 = Color3.fromRGB(150, 150, 165)
             tab.BackgroundColor3 = Color3.fromRGB(26, 26, 34)
@@ -847,7 +847,7 @@ function updateAllUIThemeColors(color)
         local s = tab:FindFirstChild("TabStroke")
         if s then s.Color = color end
     end
-    if _G.__RivalHubRefreshESPTheme then pcall(_G.__RivalHubRefreshESPTheme, color) end
+    if _G.__AncioteRefreshESPTheme then pcall(_G.__AncioteRefreshESPTheme, color) end
     if main then
         local titleFrame = main:FindFirstChild("Frame")
         if titleFrame then
@@ -863,11 +863,11 @@ function updateAllUIThemeColors(color)
         colorSelectorLabel.TextColor3 = color
     end
 
-    if _G._rivalHubStealSlide then
-        _G._rivalHubStealSlide.BackgroundColor3 = color
-        local sg = _G._rivalHubStealSlide:FindFirstChildOfClass("UIGradient")
-        if sg then sg.Color = rivalHubGradient(color) end
-        local ss = _G._rivalHubStealSlide:FindFirstChildOfClass("UIStroke")
+    if _G._AncioteStealSlide then
+        _G._AncioteStealSlide.BackgroundColor3 = color
+        local sg = _G._AncioteStealSlide:FindFirstChildOfClass("UIGradient")
+        if sg then sg.Color = AncioteGradient(color) end
+        local ss = _G._AncioteStealSlide:FindFirstChildOfClass("UIStroke")
         if ss then ss.Color = color end
     end
 
@@ -952,8 +952,8 @@ local function applyBody(char)
                     w.Part0 = orig
                     w.Part1 = c
                     w.Parent = c
-                    if orig:GetAttribute("RivalHubOutfitOriginalTransparency") == nil then
-                        orig:SetAttribute("RivalHubOutfitOriginalTransparency", orig.Transparency)
+                    if orig:GetAttribute("AncioteOutfitOriginalTransparency") == nil then
+                        orig:SetAttribute("AncioteOutfitOriginalTransparency", orig.Transparency)
                     end
                     orig.Transparency = 1
                     total = total + 1
@@ -1118,15 +1118,15 @@ local function clearPreviousOutfitAssets(char)
     end
     for _, part in ipairs(char:GetDescendants()) do
         if part:IsA("BasePart") then
-            local originalTransparency = part:GetAttribute("RivalHubOutfitOriginalTransparency")
+            local originalTransparency = part:GetAttribute("AncioteOutfitOriginalTransparency")
             if originalTransparency ~= nil then
                 part.Transparency = originalTransparency
-                part:SetAttribute("RivalHubOutfitOriginalTransparency", nil)
+                part:SetAttribute("AncioteOutfitOriginalTransparency", nil)
             end
-            local originalLocalTransparency = part:GetAttribute("RivalHubOutfitOriginalLocalTransparency")
+            local originalLocalTransparency = part:GetAttribute("AncioteOutfitOriginalLocalTransparency")
             if originalLocalTransparency ~= nil then
                 part.LocalTransparencyModifier = originalLocalTransparency
-                part:SetAttribute("RivalHubOutfitOriginalLocalTransparency", nil)
+                part:SetAttribute("AncioteOutfitOriginalLocalTransparency", nil)
             end
         end
     end
@@ -1139,24 +1139,24 @@ local function clearPreviousOutfitAssets(char)
         bc.Parent = char
     end
     local head = char:FindFirstChild("Head")
-    if head and head:IsA("MeshPart") and head:GetAttribute("RivalHubOutfitModifiedMeshPart") then
+    if head and head:IsA("MeshPart") and head:GetAttribute("AncioteOutfitModifiedMeshPart") then
         pcall(function()
-            head.MeshId = head:GetAttribute("RivalHubOutfitOriginalMeshId") or ""
-            head.TextureID = head:GetAttribute("RivalHubOutfitOriginalTextureId") or ""
+            head.MeshId = head:GetAttribute("AncioteOutfitOriginalMeshId") or ""
+            head.TextureID = head:GetAttribute("AncioteOutfitOriginalTextureId") or ""
         end)
-        head:SetAttribute("RivalHubOutfitModifiedMeshPart", nil)
-        head:SetAttribute("RivalHubOutfitOriginalMeshId", nil)
-        head:SetAttribute("RivalHubOutfitOriginalTextureId", nil)
+        head:SetAttribute("AncioteOutfitModifiedMeshPart", nil)
+        head:SetAttribute("AncioteOutfitOriginalMeshId", nil)
+        head:SetAttribute("AncioteOutfitOriginalTextureId", nil)
     elseif head then
         local specialMesh = head:FindFirstChildWhichIsA("SpecialMesh")
-        if specialMesh and specialMesh:GetAttribute("RivalHubOutfitCreatedMesh") then
+        if specialMesh and specialMesh:GetAttribute("AncioteOutfitCreatedMesh") then
             specialMesh:Destroy()
-        elseif specialMesh and specialMesh:GetAttribute("RivalHubOutfitModifiedMesh") then
-            specialMesh.MeshId = specialMesh:GetAttribute("RivalHubOutfitOriginalMeshId") or ""
-            specialMesh.TextureId = specialMesh:GetAttribute("RivalHubOutfitOriginalTextureId") or ""
-            specialMesh:SetAttribute("RivalHubOutfitModifiedMesh", nil)
-            specialMesh:SetAttribute("RivalHubOutfitOriginalMeshId", nil)
-            specialMesh:SetAttribute("RivalHubOutfitOriginalTextureId", nil)
+        elseif specialMesh and specialMesh:GetAttribute("AncioteOutfitModifiedMesh") then
+            specialMesh.MeshId = specialMesh:GetAttribute("AncioteOutfitOriginalMeshId") or ""
+            specialMesh.TextureId = specialMesh:GetAttribute("AncioteOutfitOriginalTextureId") or ""
+            specialMesh:SetAttribute("AncioteOutfitModifiedMesh", nil)
+            specialMesh:SetAttribute("AncioteOutfitOriginalMeshId", nil)
+            specialMesh:SetAttribute("AncioteOutfitOriginalTextureId", nil)
         end
     end
 end
@@ -1232,21 +1232,21 @@ local function applyNoOutfit(char)
         if item:IsA("Accessory") then
             for _, part in ipairs(item:GetDescendants()) do
                 if part:IsA("BasePart") then
-                    local original = part:GetAttribute("RivalHubOriginalTransparency")
-                    if original ~= nil then part.Transparency = original; part:SetAttribute("RivalHubOriginalTransparency", nil) end
-                    local originalLocal = part:GetAttribute("RivalHubOriginalLocalTransparency")
-                    if originalLocal ~= nil then part.LocalTransparencyModifier = originalLocal; part:SetAttribute("RivalHubOriginalLocalTransparency", nil) end
+                    local original = part:GetAttribute("AncioteOriginalTransparency")
+                    if original ~= nil then part.Transparency = original; part:SetAttribute("AncioteOriginalTransparency", nil) end
+                    local originalLocal = part:GetAttribute("AncioteOriginalLocalTransparency")
+                    if originalLocal ~= nil then part.LocalTransparencyModifier = originalLocal; part:SetAttribute("AncioteOriginalLocalTransparency", nil) end
                 end
             end
         elseif item:IsA("Shirt") then
-            local original = item:GetAttribute("RivalHubOriginalTemplate")
-            if original ~= nil then item.ShirtTemplate = original; item:SetAttribute("RivalHubOriginalTemplate", nil) end
+            local original = item:GetAttribute("AncioteOriginalTemplate")
+            if original ~= nil then item.ShirtTemplate = original; item:SetAttribute("AncioteOriginalTemplate", nil) end
         elseif item:IsA("Pants") then
-            local original = item:GetAttribute("RivalHubOriginalTemplate")
-            if original ~= nil then item.PantsTemplate = original; item:SetAttribute("RivalHubOriginalTemplate", nil) end
+            local original = item:GetAttribute("AncioteOriginalTemplate")
+            if original ~= nil then item.PantsTemplate = original; item:SetAttribute("AncioteOriginalTemplate", nil) end
         elseif item:IsA("ShirtGraphic") then
-            local original = item:GetAttribute("RivalHubOriginalGraphic")
-            if original ~= nil then item.Graphic = original; item:SetAttribute("RivalHubOriginalGraphic", nil) end
+            local original = item:GetAttribute("AncioteOriginalGraphic")
+            if original ~= nil then item.Graphic = original; item:SetAttribute("AncioteOriginalGraphic", nil) end
         end
     end
 end
@@ -1263,7 +1263,7 @@ local outfitSelectorLabel = nil
 -- ===== VX7 Avatars (portado de VX7 Hub) =====
 VX7A = {
     index = 0, mod = nil, loading = false, busy = false, pending = nil, label = nil,
-    labels = {"OFF", "ALIEN", "OUTFIT", "OUTFIT 2", "OUTFIT 3", "OUTFIT 4", "OUTFIT 5", "OUTFIT 6", "RIVAL", "NEW SKIN"},
+    labels = {"OFF", "ALIEN", "OUTFIT", "OUTFIT 2", "OUTFIT 3", "OUTFIT 4", "OUTFIT 5", "OUTFIT 6", "Anciote", "NEW SKIN"},
 }
 VX7A.src = [==[
 local Players = game:GetService("Players")
@@ -1336,7 +1336,7 @@ clearOriginalWearables = true,
 items = {74891470, 4390891467, 91274263831244, 128424248603010, 91151766440767, 17044638424},
 },
 {
-label = "RIVAL",
+label = "Anciote",
 hideOriginal = false,
 headless = true,
 hideRightLeg = true,
@@ -1900,7 +1900,7 @@ table.insert(state.visuals, holder)
 return added
 end
 local assetInfoCache = {}
-local ASSET_INFO_CACHE_FILE="RivalHubAvatarAssets.json"
+local ASSET_INFO_CACHE_FILE="AncioteAvatarAssets.json"
 pcall(function()
 if isfile and readfile and isfile(ASSET_INFO_CACHE_FILE) then
 local decoded=HttpService:JSONDecode(readfile(ASSET_INFO_CACHE_FILE))
@@ -2393,7 +2393,7 @@ function VX7A.apply(index)
     if index == 0 then VX7A.stop() return end
     local m = VX7A.load()
     if not m or type(m.apply) ~= "function" then
-        warn("[Rival Hub] No se pudo cargar el modulo de avatares VX7 (loadstring no disponible).")
+        warn("[Anciote] No se pudo cargar el modulo de avatares VX7 (loadstring no disponible).")
         VX7A.setLabel()
         return
     end
@@ -2417,9 +2417,9 @@ end
 
 pcall(function()
     LP.CharacterAdded:Connect(function()
-        if _G.RivalHubSession ~= _mySession or VX7A.index == 0 then return end
+        if _G.AncioteSession ~= _mySession or VX7A.index == 0 then return end
         task.delay(1.5, function()
-            if _G.RivalHubSession == _mySession and VX7A.index ~= 0 then VX7A.apply(VX7A.index) end
+            if _G.AncioteSession == _mySession and VX7A.index ~= 0 then VX7A.apply(VX7A.index) end
         end)
     end)
 end)
@@ -2470,9 +2470,9 @@ local function applyHeadlessKorblox(char)
     pcall(function() LP.CharacterAvatarType = Enum.AvatarType.R6 end)
     local head = char:FindFirstChild("Head")
     if head then
-        if head:GetAttribute("RivalHubOutfitOriginalTransparency") == nil then
-            head:SetAttribute("RivalHubOutfitOriginalTransparency", head.Transparency)
-            head:SetAttribute("RivalHubOutfitOriginalLocalTransparency", head.LocalTransparencyModifier)
+        if head:GetAttribute("AncioteOutfitOriginalTransparency") == nil then
+            head:SetAttribute("AncioteOutfitOriginalTransparency", head.Transparency)
+            head:SetAttribute("AncioteOutfitOriginalLocalTransparency", head.LocalTransparencyModifier)
         end
         head.Transparency = 1
         head.CanCollide = false
@@ -2492,9 +2492,9 @@ local function applyHeadlessKorblox(char)
                 if (p0 and p0.Name == "Head") or (p1 and p1.Name == "Head") then
                     for _, part in ipairs(v:GetDescendants()) do
                         if part:IsA("BasePart") then
-                            if part:GetAttribute("RivalHubOutfitOriginalTransparency") == nil then
-                                part:SetAttribute("RivalHubOutfitOriginalTransparency", part.Transparency)
-                                part:SetAttribute("RivalHubOutfitOriginalLocalTransparency", part.LocalTransparencyModifier)
+                            if part:GetAttribute("AncioteOutfitOriginalTransparency") == nil then
+                                part:SetAttribute("AncioteOutfitOriginalTransparency", part.Transparency)
+                                part:SetAttribute("AncioteOutfitOriginalLocalTransparency", part.LocalTransparencyModifier)
                             end
                             part.Transparency = 1
                             part.LocalTransparencyModifier = 1
@@ -2512,8 +2512,8 @@ local function applyHeadlessKorblox(char)
         for _, partName in ipairs(rightLegConfig.partsToHide) do
             local limb = char:FindFirstChild(partName)
             if limb and limb:IsA("BasePart") then
-                if limb:GetAttribute("RivalHubOutfitOriginalTransparency") == nil then
-                    limb:SetAttribute("RivalHubOutfitOriginalTransparency", limb.Transparency)
+                if limb:GetAttribute("AncioteOutfitOriginalTransparency") == nil then
+                    limb:SetAttribute("AncioteOutfitOriginalTransparency", limb.Transparency)
                 end
                 limb.Transparency = 1
             end
@@ -2547,22 +2547,22 @@ function applyOutfitByIndex(index)
         if item:IsA("Accessory") and item.Name:sub(1, #TAG) ~= TAG then
             for _, part in ipairs(item:GetDescendants()) do
                 if part:IsA("BasePart") then
-                    if part:GetAttribute("RivalHubOriginalTransparency") == nil then
-                        part:SetAttribute("RivalHubOriginalTransparency", part.Transparency)
-                        part:SetAttribute("RivalHubOriginalLocalTransparency", part.LocalTransparencyModifier)
+                    if part:GetAttribute("AncioteOriginalTransparency") == nil then
+                        part:SetAttribute("AncioteOriginalTransparency", part.Transparency)
+                        part:SetAttribute("AncioteOriginalLocalTransparency", part.LocalTransparencyModifier)
                     end
                     part.Transparency = 1
                     part.LocalTransparencyModifier = 1
                 end
             end
         elseif item:IsA("Shirt") then
-            if item:GetAttribute("RivalHubOriginalTemplate") == nil then item:SetAttribute("RivalHubOriginalTemplate", item.ShirtTemplate) end
+            if item:GetAttribute("AncioteOriginalTemplate") == nil then item:SetAttribute("AncioteOriginalTemplate", item.ShirtTemplate) end
             item.ShirtTemplate = ""
         elseif item:IsA("Pants") then
-            if item:GetAttribute("RivalHubOriginalTemplate") == nil then item:SetAttribute("RivalHubOriginalTemplate", item.PantsTemplate) end
+            if item:GetAttribute("AncioteOriginalTemplate") == nil then item:SetAttribute("AncioteOriginalTemplate", item.PantsTemplate) end
             item.PantsTemplate = ""
         elseif item:IsA("ShirtGraphic") then
-            if item:GetAttribute("RivalHubOriginalGraphic") == nil then item:SetAttribute("RivalHubOriginalGraphic", item.Graphic) end
+            if item:GetAttribute("AncioteOriginalGraphic") == nil then item:SetAttribute("AncioteOriginalGraphic", item.Graphic) end
             item.Graphic = ""
         end
     end
@@ -2596,10 +2596,10 @@ function applyOutfitByIndex(index)
     local done = false
     if head:IsA("MeshPart") then
         done = pcall(function()
-            if not head:GetAttribute("RivalHubOutfitModifiedMeshPart") then
-                head:SetAttribute("RivalHubOutfitOriginalMeshId", head.MeshId)
-                head:SetAttribute("RivalHubOutfitOriginalTextureId", head.TextureID)
-                head:SetAttribute("RivalHubOutfitModifiedMeshPart", true)
+            if not head:GetAttribute("AncioteOutfitModifiedMeshPart") then
+                head:SetAttribute("AncioteOutfitOriginalMeshId", head.MeshId)
+                head:SetAttribute("AncioteOutfitOriginalTextureId", head.TextureID)
+                head:SetAttribute("AncioteOutfitModifiedMeshPart", true)
             end
             head.MeshId = cfg.headMesh
             head.TextureID = cfg.headTexture or ""
@@ -2609,11 +2609,11 @@ function applyOutfitByIndex(index)
         local sm = head:FindFirstChildWhichIsA("SpecialMesh")
         if not sm then
             sm = Instance.new("SpecialMesh")
-            sm:SetAttribute("RivalHubOutfitCreatedMesh", true)
-        elseif not sm:GetAttribute("RivalHubOutfitModifiedMesh") then
-            sm:SetAttribute("RivalHubOutfitOriginalMeshId", sm.MeshId)
-            sm:SetAttribute("RivalHubOutfitOriginalTextureId", sm.TextureId)
-            sm:SetAttribute("RivalHubOutfitModifiedMesh", true)
+            sm:SetAttribute("AncioteOutfitCreatedMesh", true)
+        elseif not sm:GetAttribute("AncioteOutfitModifiedMesh") then
+            sm:SetAttribute("AncioteOutfitOriginalMeshId", sm.MeshId)
+            sm:SetAttribute("AncioteOutfitOriginalTextureId", sm.TextureId)
+            sm:SetAttribute("AncioteOutfitModifiedMesh", true)
         end
         sm.Parent = head
         sm.MeshType = Enum.MeshType.FileMesh
@@ -2859,7 +2859,7 @@ function getSpeedModeName()
     else return "NORMAL" end
 end
 
-local _s2VelState = _G.__RivalHubSpeedHookState
+local _s2VelState = _G.__AncioteSpeedHookState
 if type(_s2VelState) ~= "table" then
     _s2VelState = {
         hooked = false,
@@ -2867,7 +2867,7 @@ if type(_s2VelState) ~= "table" then
         root = nil,
         v = _V3zero,
     }
-    _G.__RivalHubSpeedHookState = _s2VelState
+    _G.__AncioteSpeedHookState = _s2VelState
 end
 local _velChecked = _s2VelState.velChecked
 local _hookedVelParts = {}
@@ -2981,7 +2981,7 @@ local function _applyVelocitySpeed(dir, speed, hrp)
         hrp.AssemblyLinearVelocity = _V3new(unit.X * speed, verticalVelocity, unit.Z * speed)
         local visibleSpeed = math.min(speed, 20)
         _s2VelState.v = _V3new(unit.X * visibleSpeed, verticalVelocity, unit.Z * visibleSpeed)
-        _G.__RivalHubLiveSpeed = { t = os.clock(), v = speed }
+        _G.__AncioteLiveSpeed = { t = os.clock(), v = speed }
     else
         _s2VelState.v = _V3new(0, verticalVelocity, 0)
         hrp.AssemblyLinearVelocity = _V3new(0, verticalVelocity, 0)
@@ -4036,7 +4036,7 @@ local _antiFlingState = {
 local _ANTI_FLING_DRIVE_GRACE = 0.3
 
 local function _afHubSpeedLive()
-    local live = _G.__RivalHubLiveSpeed
+    local live = _G.__AncioteLiveSpeed
     if type(live) ~= "table" then return false end
     local stamp, speed = tonumber(live.t), tonumber(live.v)
     if not stamp or not speed or speed <= 0 then return false end
@@ -4120,7 +4120,7 @@ local function createESP()
         esp.Tracer.ZIndex = 2
     end
 
-    esp.Highlight.Name = "RivalHubESP_Highlight"
+    esp.Highlight.Name = "AncioteESP_Highlight"
     esp.Highlight.FillColor = currentFill
     esp.Highlight.OutlineColor = Color3.fromRGB(0, 0, 0)
     esp.Highlight.FillTransparency = 0.12
@@ -4134,7 +4134,7 @@ local function createESP()
     pcall(function() esp.Highlight.Parent = parentGui end)
 
     local nameBillboard = Instance.new("BillboardGui")
-    nameBillboard.Name = "RivalHubESP_Name"
+    nameBillboard.Name = "AncioteESP_Name"
     nameBillboard.Size = UDim2.new(0, 170, 0, 28)
     nameBillboard.StudsOffset = Vector3.new(0, 1.3, 0)
     nameBillboard.AlwaysOnTop = true
@@ -4179,7 +4179,7 @@ local function createESP()
     return esp
 end
 
-_G.__RivalHubRefreshESPTheme = function(accent, outlineColor)
+_G.__AncioteRefreshESPTheme = function(accent, outlineColor)
     local fillColor, lineColor = getESPThemeColors(accent)
     for _, data in pairs(espActivePlayers) do
         if type(data) == "table" and data.esp then
@@ -4318,7 +4318,7 @@ local _espLineState = { scanElapsed = math.huge, targetRoot = nil }
 local function ensureESPLineGui()
     if _espLineGui and _espLineGui.Parent then return end
     _espLineGui = Instance.new("ScreenGui")
-    _espLineGui.Name = "RivalHubESPLine"
+    _espLineGui.Name = "AncioteESPLine"
     _espLineGui.IgnoreGuiInset = true
     _espLineGui.ResetOnSpawn = false
     _espLineGui.DisplayOrder = 1000
@@ -4648,13 +4648,13 @@ end
 function setupSpeedIndicator(char)
     local head = char:WaitForChild("Head", 5)
     if not head then return end
-    local oldBB = head:FindFirstChild("RivalHubSpeedIndicator")
+    local oldBB = head:FindFirstChild("AncioteSpeedIndicator")
     if oldBB then oldBB:Destroy() end
     local oldDiscord = head:FindFirstChild("DiscordText")
     if oldDiscord then oldDiscord:Destroy() end
 
     local bb = Instance.new("BillboardGui", head)
-    bb.Name = "RivalHubSpeedIndicator"
+    bb.Name = "AncioteSpeedIndicator"
     bb.Size = UDim2.fromOffset(200, 30)
     bb.StudsOffset = Vector3.new(0, 3.2, 0)
     bb.AlwaysOnTop = true
@@ -4738,20 +4738,20 @@ function toggleCarryMode()
         laggerToggled = false; laggerCarryToggled = false; speedMode = true
     else speedMode = not speedMode end
     resetMovementState()
-    if _G.__RivalHubApplySpeedNow then pcall(_G.__RivalHubApplySpeedNow) end
+    if _G.__AncioteApplySpeedNow then pcall(_G.__AncioteApplySpeedNow) end
 end
 
 function toggleLaggerMode()
     if laggerCarryToggled then laggerCarryToggled = false end
     speedMode = false; laggerToggled = not laggerToggled
     resetMovementState()
-    if _G.__RivalHubApplySpeedNow then pcall(_G.__RivalHubApplySpeedNow) end
+    if _G.__AncioteApplySpeedNow then pcall(_G.__AncioteApplySpeedNow) end
 end
 function toggleLaggerCarryMode()
     if laggerToggled then laggerToggled = false end
     speedMode = false; laggerCarryToggled = not laggerCarryToggled
     resetMovementState()
-    if _G.__RivalHubApplySpeedNow then pcall(_G.__RivalHubApplySpeedNow) end
+    if _G.__AncioteApplySpeedNow then pcall(_G.__AncioteApplySpeedNow) end
 end
 
 function toggleLaggerCycle()
@@ -4769,7 +4769,7 @@ function toggleLaggerCycle()
         laggerCarryToggled = false
     end
     resetMovementState()
-    if _G.__RivalHubApplySpeedNow then pcall(_G.__RivalHubApplySpeedNow) end
+    if _G.__AncioteApplySpeedNow then pcall(_G.__AncioteApplySpeedNow) end
 end
 
 function stopAutoLeft()
@@ -5287,7 +5287,7 @@ end
 local circleConnection = nil
 local circleSafetyConn = nil
 
-local function getRivalHubAimbotBat(char)
+local function getAncioteAimbotBat(char)
     local equipped = char and char:FindFirstChildOfClass("Tool")
     if equipped then
         local name = equipped.Name:lower()
@@ -5305,7 +5305,7 @@ local function getRivalHubAimbotBat(char)
     return nil
 end
 
-local function getRivalHubRenderCFrame(root)
+local function getAncioteRenderCFrame(root)
     if not root then return nil end
     local ok, rendered = pcall(root.GetRenderCFrame, root)
     return ok and rendered or root.CFrame
@@ -5313,27 +5313,27 @@ end
 
 startCircleCombat = function()
     if circleConnection then return end
-    local bubbleAimbot = _G.__RivalHubBubbleAimbotState or { nextSwingAt = 0, target = nil, intendedVelocity = Vector3.zero }
-    _G.__RivalHubBubbleAimbotState = bubbleAimbot
+    local bubbleAimbot = _G.__AncioteBubbleAimbotState or { nextSwingAt = 0, target = nil, intendedVelocity = Vector3.zero }
+    _G.__AncioteBubbleAimbotState = bubbleAimbot
 
     local function clearAngV()
         local c = LP.Character
         local r = c and c:FindFirstChild("HumanoidRootPart")
         if r then
-            local a = r:FindFirstChild("_RivalHub_AngV"); if a then a:Destroy() end
-            local at = r:FindFirstChild("_RivalHub_Att"); if at then at:Destroy() end
+            local a = r:FindFirstChild("_Anciote_AngV"); if a then a:Destroy() end
+            local at = r:FindFirstChild("_Anciote_Att"); if at then at:Destroy() end
         end
     end
 
     local function ensureAngV(r)
         if not r then return nil end
-        local a = r:FindFirstChild("_RivalHub_AngV"); if a then a:Destroy() end
-        local at = r:FindFirstChild("_RivalHub_Att"); if at then at:Destroy() end
+        local a = r:FindFirstChild("_Anciote_AngV"); if a then a:Destroy() end
+        local at = r:FindFirstChild("_Anciote_Att"); if at then at:Destroy() end
         local att = Instance.new("Attachment")
-        att.Name = "_RivalHub_Att"
+        att.Name = "_Anciote_Att"
         att.Parent = r
         local angV = Instance.new("AngularVelocity")
-        angV.Name = "_RivalHub_AngV"
+        angV.Name = "_Anciote_AngV"
         angV.Attachment0 = att
         angV.RelativeTo = Enum.ActuatorRelativeTo.World
         angV.MaxTorque = math.huge
@@ -5359,10 +5359,10 @@ startCircleCombat = function()
         end
         humanoid.AutoRotate = false
 
-        local angV = root:FindFirstChild("_RivalHub_AngV")
+        local angV = root:FindFirstChild("_Anciote_AngV")
         if not angV or not angV.Parent then angV = ensureAngV(root) end
 
-        local bat = getRivalHubAimbotBat(char)
+        local bat = getAncioteAimbotBat(char)
         if bat and bat.Parent ~= char then
             pcall(humanoid.EquipTool, humanoid, bat)
         end
@@ -5457,8 +5457,8 @@ stopCircleCombat = function()
         local c = LP.Character
         local r = c and c:FindFirstChild("HumanoidRootPart")
         if r then
-            local a = r:FindFirstChild("_RivalHub_AngV"); if a then a:Destroy() end
-            local at = r:FindFirstChild("_RivalHub_Att"); if at then at:Destroy() end
+            local a = r:FindFirstChild("_Anciote_AngV"); if a then a:Destroy() end
+            local at = r:FindFirstChild("_Anciote_Att"); if at then at:Destroy() end
         end
     end
     if predictionSphere then
@@ -5489,9 +5489,9 @@ stopCircleCombat = function()
     peakHeight = 0
     isMultiJumping = false
     lastActivationTime = 0
-    if _G.__RivalHubBubbleAimbotState then
-        _G.__RivalHubBubbleAimbotState.target = nil
-        _G.__RivalHubBubbleAimbotState.nextSwingAt = 0
+    if _G.__AncioteBubbleAimbotState then
+        _G.__AncioteBubbleAimbotState.target = nil
+        _G.__AncioteBubbleAimbotState.nextSwingAt = 0
     end
 end
 
@@ -6064,7 +6064,7 @@ local function _alIsProtectedVisual(object)
         end
         local name = parent.Name or ""
         if name:match("^Crystal") or name:match("^Eclipse") or name:match("^ESP_")
-            or name:match("^BloodHounds") or name:match("^RivalHub") then
+            or name:match("^BloodHounds") or name:match("^Anciote") then
             return true
         end
         parent = parent.Parent
@@ -6660,10 +6660,10 @@ local function drag(f, dragZoneHeight)
     end)
 end
 
-_G.__RivalHubSpeedEngine = _G.__RivalHubSpeedEngine or { started = false, conn = nil }
-_G.__RivalHubSpeedEngine.signal = nil
+_G.__AncioteSpeedEngine = _G.__AncioteSpeedEngine or { started = false, conn = nil }
+_G.__AncioteSpeedEngine.signal = nil
 do
-    _G.__RivalHubSpeedEngine.signal = RunService.RenderStepped
+    _G.__AncioteSpeedEngine.signal = RunService.RenderStepped
 end
 
 local function _spd_isRagdollState(hum)
@@ -6699,22 +6699,22 @@ local function _spd_resetMovement()
 end
 
 local function _spd_stop()
-    if _G.__RivalHubSpeedEngine.conn then
-        _G.__RivalHubSpeedEngine.conn:Disconnect()
-        _G.__RivalHubSpeedEngine.conn = nil
+    if _G.__AncioteSpeedEngine.conn then
+        _G.__AncioteSpeedEngine.conn:Disconnect()
+        _G.__AncioteSpeedEngine.conn = nil
     end
     _spd_resetMovement()
 end
 
 local function _spd_start()
     _spd_stop()
-    _G.__RivalHubSpeedEngine.started = true
-    _G.__RivalHubSpeedEngine.acc = 0
+    _G.__AncioteSpeedEngine.started = true
+    _G.__AncioteSpeedEngine.acc = 0
 
-    _G.__RivalHubSpeedEngine.conn = _G.__RivalHubSpeedEngine.signal:Connect(function(dt)
-        _G.__RivalHubSpeedEngine.acc = (_G.__RivalHubSpeedEngine.acc or 0) + (dt or 0)
-        if _G.__RivalHubSpeedEngine.acc < 0.016 then return end
-        _G.__RivalHubSpeedEngine.acc = 0
+    _G.__AncioteSpeedEngine.conn = _G.__AncioteSpeedEngine.signal:Connect(function(dt)
+        _G.__AncioteSpeedEngine.acc = (_G.__AncioteSpeedEngine.acc or 0) + (dt or 0)
+        if _G.__AncioteSpeedEngine.acc < 0.016 then return end
+        _G.__AncioteSpeedEngine.acc = 0
 
         local character = LP.Character
         local humanoid = character and character:FindFirstChildOfClass("Humanoid")
@@ -6723,7 +6723,7 @@ local function _spd_start()
         if autoBatEnabled
            or autoLeftEnabled or autoRightEnabled
            or dropActive or _G.IsDropping
-           or (_G.__RivalHubIsBatV2 and _G.__RivalHubIsBatV2()) then
+           or (_G.__AncioteIsBatV2 and _G.__AncioteIsBatV2()) then
             _spd_resetMovement()
             return
         end
@@ -6766,9 +6766,9 @@ local function _spd_refresh()
     _spd_start()
 end
 
-_G.__RivalHubRefreshSpeedEngine = _spd_refresh
-_G.__RivalHubStopSpeedEngine = _spd_stop
-_G.__RivalHubApplySpeedNow = _spd_applyNow
+_G.__AncioteRefreshSpeedEngine = _spd_refresh
+_G.__AncioteStopSpeedEngine = _spd_stop
+_G.__AncioteApplySpeedNow = _spd_applyNow
 
 pcall(_spd_start)
 
@@ -6868,7 +6868,7 @@ function stopAllBackgroundTasks()
     disableAutoBat()
     stopAutoLeft()
     stopAutoRight()
-    if _G.__RivalHubStopBatV2 then pcall(_G.__RivalHubStopBatV2) end
+    if _G.__AncioteStopBatV2 then pcall(_G.__AncioteStopBatV2) end
     if TPBatState and TPBatState.enabled and tpBatSetEnabled then pcall(tpBatSetEnabled, false) end
     if unwalkEnabled then stopUnwalk() end
     if antiLagEnabled then disableAntiLag() end
@@ -6891,10 +6891,10 @@ function stopAllBackgroundTasks()
     lastDropTime = 0
     medusaDebounce = false
     medusaLastUsed = 0
-    if _G.__RivalHubStopSpeedEngine then pcall(_G.__RivalHubStopSpeedEngine) end
+    if _G.__AncioteStopSpeedEngine then pcall(_G.__AncioteStopSpeedEngine) end
 end
 
-local _rivalHubSaveState = {
+local _AncioteSaveState = {
     lastAt = 0,
     queued = false,
     writing = false,
@@ -6902,7 +6902,7 @@ local _rivalHubSaveState = {
     revision = 0,
     retryCount = 0,
 }
-local function resolveRivalHubFileApi()
+local function resolveAncioteFileApi()
     local env = (type(getgenv) == "function" and getgenv()) or _G
     local synApi = rawget(env, "syn") or rawget(_G, "syn")
     local readCandidates = {rawget(env, "readfile"), synApi and synApi.readfile, rawget(_G, "readfile")}
@@ -6913,8 +6913,8 @@ local function resolveRivalHubFileApi()
     return readFn, writeFn
 end
 
-local function rivalHubFileExists(path)
-    local readFn = resolveRivalHubFileApi()
+local function AncioteFileExists(path)
+    local readFn = resolveAncioteFileApi()
     if not readFn then return false end
     local ok, data = pcall(readFn, path)
     return ok and type(data) == "string"
@@ -6958,14 +6958,14 @@ function buildConfigTable()
         backgroundImageTransparency = backgroundImageTransparency,
         backgroundMode = backgroundMode, floatingButtonScale = floatingButtonScale,
         outfitIndex = currentOutfitIndex, vx7AvatarIndex = VX7A.index, themeColor = currentColorTheme,
-        rivalTitleTheme = currentRivalTitleTheme,
+        AncioteTitleTheme = currentAncioteTitleTheme,
         infiniteJumpEnabled = InfiniteJump.enabled == true,
         infiniteJumpMode = InfiniteJump.mode == "manual" and "manual" or "hold",
         autoStealMode = autoStealMode == "V2" and "V2" or "V1",
-        batV2 = _G.__RivalHubIsBatV2 and _G.__RivalHubIsBatV2() or false,
+        batV2 = _G.__AncioteIsBatV2 and _G.__AncioteIsBatV2() or false,
     }
     if main then
-        local basePos = _G.__RivalHubMainOriginalPos or main.Position
+        local basePos = _G.__AncioteMainOriginalPos or main.Position
         config.mainPosition = {
             XScale = basePos.X.Scale,
             XOffset = basePos.X.Offset,
@@ -6988,12 +6988,12 @@ function buildConfigTable()
     return config
 end
 
-local function scheduleRivalHubSave(delaySeconds)
-    if _rivalHubSaveState.queued then return end
-    _rivalHubSaveState.queued = true
+local function scheduleAncioteSave(delaySeconds)
+    if _AncioteSaveState.queued then return end
+    _AncioteSaveState.queued = true
     task.delay(delaySeconds or 0.25, function()
-        _rivalHubSaveState.queued = false
-        if _G.RivalHubRunning and not _isResetting and not _isLoading then
+        _AncioteSaveState.queued = false
+        if _G.AncioteRunning and not _isResetting and not _isLoading then
             pcall(saveAllSettings, true)
         end
     end)
@@ -7007,41 +7007,41 @@ function saveAllSettings(force)
     config.userId = LP.UserId
     local encodedOk, canonicalJSON = pcall(function() return HS:JSONEncode(config) end)
     if not encodedOk then
-        warn("[Rival Hub Save] Could not encode settings.")
+        warn("[Anciote Save] Could not encode settings.")
         return false
     end
-    if not force and canonicalJSON == _lastSavedJSON and not _rivalHubSaveState.dirty then
+    if not force and canonicalJSON == _lastSavedJSON and not _AncioteSaveState.dirty then
         return true
     end
-    _rivalHubSaveState.dirty = true
+    _AncioteSaveState.dirty = true
 
-    if _rivalHubSaveState.writing then
-        scheduleRivalHubSave(0.25)
+    if _AncioteSaveState.writing then
+        scheduleAncioteSave(0.25)
         return true
     end
-    if not force and _tick() - _rivalHubSaveState.lastAt < 0.25 then
-        scheduleRivalHubSave(0.25)
+    if not force and _tick() - _AncioteSaveState.lastAt < 0.25 then
+        scheduleAncioteSave(0.25)
         return true
     end
 
-    local readFn, writeFn = resolveRivalHubFileApi()
+    local readFn, writeFn = resolveAncioteFileApi()
     if not readFn or not writeFn then
-        warn("[Rival Hub Save] Executor file API is unavailable.")
-        scheduleRivalHubSave(1)
+        warn("[Anciote Save] Executor file API is unavailable.")
+        scheduleAncioteSave(1)
         return false
     end
 
-    _rivalHubSaveState.writing = true
-    _rivalHubSaveState.revision = _rivalHubSaveState.revision + 1
+    _AncioteSaveState.writing = true
+    _AncioteSaveState.revision = _AncioteSaveState.revision + 1
     local writeConfig = config
-    writeConfig.revision = _rivalHubSaveState.revision
+    writeConfig.revision = _AncioteSaveState.revision
     writeConfig.savedAt = os.time()
     local json = HS:JSONEncode(writeConfig)
     local ok = false
 
     for attempt = 1, 3 do
         local attemptOk = pcall(function()
-            if rivalHubFileExists(CONFIG_FILE) then
+            if AncioteFileExists(CONFIG_FILE) then
                 local previous = readFn(CONFIG_FILE)
                 if type(previous) == "string" then writeFn(CONFIG_FILE .. ".backup", previous) end
             end
@@ -7057,12 +7057,12 @@ function saveAllSettings(force)
         if attempt < 3 then task.wait(0.1 * attempt) end
     end
 
-    _rivalHubSaveState.writing = false
+    _AncioteSaveState.writing = false
     if ok then
-        _rivalHubSaveState.lastAt = _tick()
-        _rivalHubSaveState.retryCount = 0
+        _AncioteSaveState.lastAt = _tick()
+        _AncioteSaveState.retryCount = 0
         _lastSavedJSON = canonicalJSON
-        _rivalHubSaveState.dirty = false
+        _AncioteSaveState.dirty = false
         local latestOk, latest = pcall(function()
             local latestConfig = buildConfigTable()
             latestConfig.configVersion = 2
@@ -7070,20 +7070,20 @@ function saveAllSettings(force)
             return HS:JSONEncode(latestConfig)
         end)
         if not latestOk or latest ~= _lastSavedJSON then
-            _rivalHubSaveState.dirty = true
-            scheduleRivalHubSave(0.25)
+            _AncioteSaveState.dirty = true
+            scheduleAncioteSave(0.25)
         end
     else
-        _rivalHubSaveState.retryCount = _rivalHubSaveState.retryCount + 1
-        warn("[Rival Hub Save] Write or verification failed; will retry.")
-        scheduleRivalHubSave(math.min(2, 0.5 * _rivalHubSaveState.retryCount))
+        _AncioteSaveState.retryCount = _AncioteSaveState.retryCount + 1
+        warn("[Anciote Save] Write or verification failed; will retry.")
+        scheduleAncioteSave(math.min(2, 0.5 * _AncioteSaveState.retryCount))
     end
     return ok
 end
 
 task.spawn(function()
     task.wait(5)
-    while _G.RivalHubRunning do
+    while _G.AncioteRunning do
         task.wait(2)
         if gui and main and not _isLoading then pcall(saveAllSettings) end
     end
@@ -7095,11 +7095,11 @@ pcall(function()
 end)
 
 do
-    local readFn, writeFn = resolveRivalHubFileApi()
+    local readFn, writeFn = resolveAncioteFileApi()
     if readFn and writeFn then
         local legacyPaths = {
             "Fresh_"       .. tostring(LP.UserId) .. ".json",
-            "Rival_"       .. tostring(LP.UserId) .. ".json",
+            "Anciote_"       .. tostring(LP.UserId) .. ".json",
             "BloodHounds_" .. tostring(LP.UserId) .. ".json",
         }
         local okNew, _ = pcall(readFn, CONFIG_FILE)
@@ -7108,7 +7108,7 @@ do
                 local okOld, old = pcall(readFn, oldPath)
                 if okOld and type(old) == "string" and #old > 0 then
                     pcall(writeFn, CONFIG_FILE, old)
-                    warn("[Rival Hub] Config migrada de " .. oldPath .. " a " .. CONFIG_FILE)
+                    warn("[Anciote] Config migrada de " .. oldPath .. " a " .. CONFIG_FILE)
                     break
                 end
             end
@@ -7117,8 +7117,8 @@ do
 end
 
 function loadAllSettings()
-    local readFn = resolveRivalHubFileApi()
-    if not readFn or not rivalHubFileExists(CONFIG_FILE) then return false end
+    local readFn = resolveAncioteFileApi()
+    if not readFn or not AncioteFileExists(CONFIG_FILE) then return false end
     local success, data = pcall(function() return HS:JSONDecode(readFn(CONFIG_FILE)) end)
     if not success or type(data) ~= "table" then return false end
     _isLoading = true
@@ -7195,8 +7195,8 @@ function loadAllSettings()
     selectedColor = COLOR_THEMES[currentColorTheme]
     task.defer(function() updateAllUIThemeColors(selectedColor) end)
 
-    if data.rivalTitleTheme and RIVAL_TITLE_THEMES[data.rivalTitleTheme] then
-        task.defer(function() applyRivalTitleTheme(data.rivalTitleTheme) end)
+    if data.AncioteTitleTheme and Anciote_TITLE_THEMES[data.AncioteTitleTheme] then
+        task.defer(function() applyAncioteTitleTheme(data.AncioteTitleTheme) end)
     end
 
     skyTheme = data.skyTheme or "Off"
@@ -7307,9 +7307,9 @@ function loadAllSettings()
     _lastSavedJSON = HS:JSONEncode(buildConfigTable())
     _isLoading = false
 
-    if data.batV2 == true and _G.__RivalHubStartBatV2 then
+    if data.batV2 == true and _G.__AncioteStartBatV2 then
         task.defer(function()
-            pcall(_G.__RivalHubStartBatV2)
+            pcall(_G.__AncioteStartBatV2)
             if mobSetBatV2 then mobSetBatV2(true) end
         end)
     end
@@ -7349,7 +7349,7 @@ function forceResetUI()
     safeSet(setAntiRagVisual, false)
     safeSet(infJumpSetVisual, false)
     safeSet(mobSetBatV2, false)
-    if _G.__RivalHubStopBatV2 then pcall(_G.__RivalHubStopBatV2) end
+    if _G.__AncioteStopBatV2 then pcall(_G.__AncioteStopBatV2) end
     disableVividGraphics()
     applyHideButtons(false)
     if _G.stretchToggleSetter then _G.stretchToggleSetter(false) end
@@ -7428,7 +7428,7 @@ function resetToFactoryDefaults()
         if antiDieEnabled then AntiDieModule.stop() end
         if antiBatEnabled and stopAntiBat then stopAntiBat() end
         if antiFlingEnabled and stopAntiFling then stopAntiFling() end
-        if _G.__RivalHubStopBatV2 then pcall(_G.__RivalHubStopBatV2) end
+        if _G.__AncioteStopBatV2 then pcall(_G.__AncioteStopBatV2) end
         stopUnwalk()
         InfiniteJump.stop()
         InfiniteJump.setMode("hold")
@@ -7462,7 +7462,7 @@ function resetToFactoryDefaults()
         uiLocked = false; mobileButtonsLocked = false
         CONFIG.AUTO_STEAL_ENABLED = false
         autoStealMode = "V1"
-        if _G._rivalHubStealModeSetter then pcall(_G._rivalHubStealModeSetter, "V1") end
+        if _G._AncioteStealModeSetter then pcall(_G._AncioteStealModeSetter, "V1") end
         BAT_AIMBOT_SPEED = 58
         BYPASS_AIMBOT_SPEED = BAT_AIMBOT_SPEED
         if State then State.bypassBatSpeed = BYPASS_AIMBOT_SPEED end
@@ -7478,9 +7478,9 @@ function resetToFactoryDefaults()
         currentOutfitIndex = 1
         pcall(VX7A.stop)
         currentColorTheme = "Gray"; selectedColor = COLOR_THEMES["Gray"]
-        currentRivalTitleTheme = "Blue"
-        applyRivalTitleTheme("Blue")
-        if main then main.Position = UDim2.new(0, 20, 0, 2); _G.__RivalHubMainOriginalPos = main.Position end
+        currentAncioteTitleTheme = "Blue"
+        applyAncioteTitleTheme("Blue")
+        if main then main.Position = UDim2.new(0, 20, 0, 2); _G.__AncioteMainOriginalPos = main.Position end
         for key, val in pairs(DEFAULT_KB) do
             if KB[key] then KB[key].kb = val.kb; KB[key].gp = val.gp end
         end
@@ -7722,7 +7722,7 @@ function buildGui()
     local INP = Color3.fromRGB(15,15,15)
     local GUI_W, GUI_H = 330, 520
 
-    local GUI_NAMES = {"RivalHub", "RivalHubMobilePanel", "RivalHubSpeedIndicator", "RivalHubBootErrors"}
+    local GUI_NAMES = {"Anciote", "AncioteMobilePanel", "AncioteSpeedIndicator", "AncioteBootErrors"}
 
     local _okCg, _coreGui = pcall(function() return game:GetService("CoreGui") end)
     local _pgOld = LP:FindFirstChild("PlayerGui")
@@ -7738,7 +7738,7 @@ function buildGui()
     end
 
     gui = Instance.new("ScreenGui")
-    gui.Name = "RivalHub"
+    gui.Name = "Anciote"
     gui.ResetOnSpawn = false
     gui.DisplayOrder = 10
     gui.IgnoreGuiInset = true
@@ -7879,7 +7879,7 @@ function buildGui()
     end
 
     miniBackgroundImage = Instance.new("ImageLabel", miniBtn)
-    miniBackgroundImage.Name = "RivalHubMiniBackground"
+    miniBackgroundImage.Name = "AncioteMiniBackground"
     miniBackgroundImage.Size = UDim2.new(1, 0, 1, 0)
     miniBackgroundImage.BackgroundTransparency = 1
     miniBackgroundImage.Image = "rbxassetid://" .. backgroundImages[backgroundIndex]
@@ -7925,7 +7925,7 @@ function buildGui()
     local miniIconLbl = Instance.new("TextLabel", miniIcon)
     miniIconLbl.Size = UDim2.new(1, 0, 1, 0)
     miniIconLbl.BackgroundTransparency = 1
-    miniIconLbl.Text = "RIVAL"
+    miniIconLbl.Text = "Anciote"
     miniIconLbl.Font = Enum.Font.GothamBlack
     miniIconLbl.TextSize = 20
     miniIconLbl.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -7941,7 +7941,7 @@ function buildGui()
     miniTitle.Size = UDim2.new(0, 150, 0, 28)
     miniTitle.Position = UDim2.new(0, 128, 0, 16)
     miniTitle.BackgroundTransparency = 1
-    miniTitle.Text = "RIVAL HUB"
+    miniTitle.Text = "Anciote"
     miniTitle.Font = Enum.Font.GothamBlack
     miniTitle.TextSize = 22
     miniTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -8023,11 +8023,11 @@ function buildGui()
 
     local _mainAnimating = false
     local mainOriginalPos = main.Position
-    _G.__RivalHubMainOriginalPos = mainOriginalPos
+    _G.__AncioteMainOriginalPos = mainOriginalPos
     main:GetPropertyChangedSignal("Position"):Connect(function()
         if not _mainAnimating then
             mainOriginalPos = main.Position
-            _G.__RivalHubMainOriginalPos = mainOriginalPos
+            _G.__AncioteMainOriginalPos = mainOriginalPos
         end
     end)
 
@@ -8115,7 +8115,7 @@ function buildGui()
 
         local tabBgGrad = Instance.new("UIGradient", btn)
         tabBgGrad.Name = "TabBgGrad"
-        tabBgGrad.Color = rivalHubGradient(getThemeColor())
+        tabBgGrad.Color = AncioteGradient(getThemeColor())
         tabBgGrad.Rotation = 0
 
         local tabStroke = Instance.new("UIStroke", btn)
@@ -8242,7 +8242,7 @@ function buildGui()
         accent.ZIndex = 8
         Instance.new("UICorner", accent).CornerRadius = UDim.new(1, 0)
         local accentGrad = Instance.new("UIGradient", accent)
-        accentGrad.Color = rivalHubGradient(getThemeColor())
+        accentGrad.Color = AncioteGradient(getThemeColor())
         accentGrad.Rotation = 90
 
         local l = Instance.new("TextLabel", f)
@@ -8525,10 +8525,10 @@ function buildGui()
     local speedPage = contentPages["Speed"]
 
     mkSect(speedPage, "Movement Speeds")
-    do local row = mkRow(speedPage, 42); mkLabel(row, "Normal Speed"); normalBox = mkBox(row, NS, 50, 56, function(v) if v == v and v > 0 and v < math.huge then NS = v; if _G.__RivalHubApplySpeedNow then pcall(_G.__RivalHubApplySpeedNow) end end end) end
-    do local row = mkRow(speedPage, 42); mkLabel(row, "Carry Speed"); carryBox = mkBox(row, CS, 50, 56, function(v) if v == v and v > 0 and v < math.huge then CS = v; if _G.__RivalHubApplySpeedNow then pcall(_G.__RivalHubApplySpeedNow) end end end) end
-    do local row = mkRow(speedPage, 42); mkLabel(row, "Lagger Normal Speed"); laggerBox = mkBox(row, LAGGER_SPEED, 50, 56, function(v) if v == v and v > 0 and v < math.huge then LAGGER_SPEED = v; if _G.__RivalHubApplySpeedNow then pcall(_G.__RivalHubApplySpeedNow) end end end) end
-    do local row = mkRow(speedPage, 42); mkLabel(row, "Lagger Carry Speed"); lagger2Box = mkBox(row, LAGGER_CARRY_SPEED, 50, 56, function(v) if v == v and v > 0 and v < math.huge then LAGGER_CARRY_SPEED = v; if _G.__RivalHubApplySpeedNow then pcall(_G.__RivalHubApplySpeedNow) end end end) end
+    do local row = mkRow(speedPage, 42); mkLabel(row, "Normal Speed"); normalBox = mkBox(row, NS, 50, 56, function(v) if v == v and v > 0 and v < math.huge then NS = v; if _G.__AncioteApplySpeedNow then pcall(_G.__AncioteApplySpeedNow) end end end) end
+    do local row = mkRow(speedPage, 42); mkLabel(row, "Carry Speed"); carryBox = mkBox(row, CS, 50, 56, function(v) if v == v and v > 0 and v < math.huge then CS = v; if _G.__AncioteApplySpeedNow then pcall(_G.__AncioteApplySpeedNow) end end end) end
+    do local row = mkRow(speedPage, 42); mkLabel(row, "Lagger Normal Speed"); laggerBox = mkBox(row, LAGGER_SPEED, 50, 56, function(v) if v == v and v > 0 and v < math.huge then LAGGER_SPEED = v; if _G.__AncioteApplySpeedNow then pcall(_G.__AncioteApplySpeedNow) end end end) end
+    do local row = mkRow(speedPage, 42); mkLabel(row, "Lagger Carry Speed"); lagger2Box = mkBox(row, LAGGER_CARRY_SPEED, 50, 56, function(v) if v == v and v > 0 and v < math.huge then LAGGER_CARRY_SPEED = v; if _G.__AncioteApplySpeedNow then pcall(_G.__AncioteApplySpeedNow) end end end) end
 
     mkSect(speedPage, "Active Mode")
     do
@@ -9021,7 +9021,7 @@ function buildGui()
     mkSect(visualPage, "Effects")
     do
         local row = mkRow(visualPage, 42)
-        mkLabel(row, "RIVAL Title Color")
+        mkLabel(row, "Anciote Title Color")
         local container = Instance.new("Frame", row)
         container.Size = UDim2.new(0, 160, 1, 0)
         container.Position = UDim2.new(1, -168, 0, 0)
@@ -9040,16 +9040,16 @@ function buildGui()
         leftBtn.AutoButtonColor = false
         leftBtn.ZIndex = 9
         Instance.new("UICorner", leftBtn).CornerRadius = UDim.new(0, 6)
-        rivalTitleSelectorLabel = Instance.new("TextLabel", container)
-        rivalTitleSelectorLabel.Size = UDim2.new(0, 80, 0, 26)
-        rivalTitleSelectorLabel.Position = UDim2.new(0.5, -40, 0.5, -13)
-        rivalTitleSelectorLabel.BackgroundTransparency = 1
-        rivalTitleSelectorLabel.Text = currentRivalTitleTheme
-        rivalTitleSelectorLabel.TextColor3 = WHITE
-        rivalTitleSelectorLabel.Font = Enum.Font.GothamBold
-        rivalTitleSelectorLabel.TextSize = 12
-        rivalTitleSelectorLabel.TextXAlignment = Enum.TextXAlignment.Center
-        rivalTitleSelectorLabel.ZIndex = 9
+        AncioteTitleSelectorLabel = Instance.new("TextLabel", container)
+        AncioteTitleSelectorLabel.Size = UDim2.new(0, 80, 0, 26)
+        AncioteTitleSelectorLabel.Position = UDim2.new(0.5, -40, 0.5, -13)
+        AncioteTitleSelectorLabel.BackgroundTransparency = 1
+        AncioteTitleSelectorLabel.Text = currentAncioteTitleTheme
+        AncioteTitleSelectorLabel.TextColor3 = WHITE
+        AncioteTitleSelectorLabel.Font = Enum.Font.GothamBold
+        AncioteTitleSelectorLabel.TextSize = 12
+        AncioteTitleSelectorLabel.TextXAlignment = Enum.TextXAlignment.Center
+        AncioteTitleSelectorLabel.ZIndex = 9
         local rightBtn = Instance.new("TextButton", container)
         rightBtn.Size = UDim2.new(0, 28, 0, 26)
         rightBtn.Position = UDim2.new(1, -28, 0.5, -13)
@@ -9064,19 +9064,19 @@ function buildGui()
         rightBtn.ZIndex = 9
         Instance.new("UICorner", rightBtn).CornerRadius = UDim.new(0, 6)
 
-        local RIVAL_THEME_LIST = { "Blue", "Red", "Green", "Black", "Gray" }
-        local function cycleRivalTitle(dir)
+        local Anciote_THEME_LIST = { "Blue", "Red", "Green", "Black", "Gray" }
+        local function cycleAncioteTitle(dir)
             local idx = 1
-            for i, name in ipairs(RIVAL_THEME_LIST) do
-                if name == currentRivalTitleTheme then idx = i; break end
+            for i, name in ipairs(Anciote_THEME_LIST) do
+                if name == currentAncioteTitleTheme then idx = i; break end
             end
             local newIdx = idx + dir
-            if newIdx < 1 then newIdx = #RIVAL_THEME_LIST end
-            if newIdx > #RIVAL_THEME_LIST then newIdx = 1 end
-            applyRivalTitleTheme(RIVAL_THEME_LIST[newIdx])
+            if newIdx < 1 then newIdx = #Anciote_THEME_LIST end
+            if newIdx > #Anciote_THEME_LIST then newIdx = 1 end
+            applyAncioteTitleTheme(Anciote_THEME_LIST[newIdx])
         end
-        leftBtn.MouseButton1Click:Connect(function() cycleRivalTitle(-1) end)
-        rightBtn.MouseButton1Click:Connect(function() cycleRivalTitle(1) end)
+        leftBtn.MouseButton1Click:Connect(function() cycleAncioteTitle(-1) end)
+        rightBtn.MouseButton1Click:Connect(function() cycleAncioteTitle(1) end)
     end
     setVividVisual = mkToggle(visualPage, "Vivid Graphics", function(on)
         toggleVividGraphics(on)
@@ -9415,7 +9415,7 @@ function buildGui()
     end
 
     pbFrame = Instance.new("Frame", gui)
-    pbFrame.Name = "RivalHubAutoStealHud"
+    pbFrame.Name = "AncioteAutoStealHud"
     local BAR_W, BAR_H = 280, 50
     pbFrame.Size = UDim2.new(0, BAR_W, 0, BAR_H)
     pbFrame.Position = UDim2.new(1, -BAR_W - 18, 0, 18)
@@ -9564,7 +9564,7 @@ do
         speed = 58,
         swingRange = 12,
     }
-    _G.__RivalHubBatV2 = V2
+    _G.__AncioteBatV2 = V2
 
     local function cleanMovers(root)
         if not root then return end
@@ -9785,9 +9785,9 @@ do
         end)
     end
 
-    _G.__RivalHubStartBatV2 = startBatV2
-    _G.__RivalHubStopBatV2  = stopBatV2
-    _G.__RivalHubIsBatV2    = function() return V2.enabled == true end
+    _G.__AncioteStartBatV2 = startBatV2
+    _G.__AncioteStopBatV2  = stopBatV2
+    _G.__AncioteIsBatV2    = function() return V2.enabled == true end
 
     LP.CharacterAdded:Connect(function()
         task.wait(0.5)
@@ -9805,7 +9805,7 @@ end
 
 function createMobilePanel()
     local panel = Instance.new("ScreenGui")
-    panel.Name = "RivalHubMobilePanel"
+    panel.Name = "AncioteMobilePanel"
     panel.ResetOnSpawn = false
     panel.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     pcall(function() if syn and syn.protect_gui then syn.protect_gui(panel) end end)
@@ -9983,7 +9983,7 @@ function createMobilePanel()
                     speedMode = false; setActive(false)
                 end
                 refreshSpeedModeLabel()
-                if _G.__RivalHubApplySpeedNow then pcall(_G.__RivalHubApplySpeedNow) end
+                if _G.__AncioteApplySpeedNow then pcall(_G.__AncioteApplySpeedNow) end
             end
         elseif name == "Lagger1" then
             callback = function(setActive)
@@ -9995,7 +9995,7 @@ function createMobilePanel()
                     laggerToggled = false; setActive(false)
                 end
                 refreshSpeedModeLabel()
-                if _G.__RivalHubApplySpeedNow then pcall(_G.__RivalHubApplySpeedNow) end
+                if _G.__AncioteApplySpeedNow then pcall(_G.__AncioteApplySpeedNow) end
             end
         elseif name == "Lagger2" then
             callback = function(setActive)
@@ -10007,15 +10007,15 @@ function createMobilePanel()
                     laggerToggled = false; setActive(false)
                 end
                 refreshSpeedModeLabel()
-                if _G.__RivalHubApplySpeedNow then pcall(_G.__RivalHubApplySpeedNow) end
+                if _G.__AncioteApplySpeedNow then pcall(_G.__AncioteApplySpeedNow) end
             end
         elseif name == "BatV2" then
             callback = function(setActive)
-                if not _G.__RivalHubIsBatV2() then
-                    _G.__RivalHubStartBatV2()
+                if not _G.__AncioteIsBatV2() then
+                    _G.__AncioteStartBatV2()
                     setActive(true)
                 else
-                    _G.__RivalHubStopBatV2()
+                    _G.__AncioteStopBatV2()
                     setActive(false)
                 end
             end
@@ -10039,7 +10039,7 @@ function createMobilePanel()
     if buttons.Lagger1 and buttons.Lagger1.setActive then buttons.Lagger1.setActive(laggerToggled) end
     if buttons.Lagger2 and buttons.Lagger2.setActive then buttons.Lagger2.setActive(laggerCarryToggled) end
     if buttons.BatV2 and buttons.BatV2.setActive then
-        buttons.BatV2.setActive(_G.__RivalHubIsBatV2 and _G.__RivalHubIsBatV2() or false)
+        buttons.BatV2.setActive(_G.__AncioteIsBatV2 and _G.__AncioteIsBatV2() or false)
     end
 
     return panel
@@ -10349,7 +10349,7 @@ function updateUIFromLoaded()
     if mobSetCarry then mobSetCarry(speedMode) end
     if mobSetLagger1 then mobSetLagger1(laggerToggled) end
     if mobSetLagger2 then mobSetLagger2(laggerCarryToggled) end
-    if mobSetBatV2 then mobSetBatV2(_G.__RivalHubIsBatV2 and _G.__RivalHubIsBatV2() or false) end
+    if mobSetBatV2 then mobSetBatV2(_G.__AncioteIsBatV2 and _G.__AncioteIsBatV2() or false) end
 
     if bodyLockEnabled and bodyLockSetVisual then
         if _blSuppressCount == 0 then
@@ -10374,14 +10374,14 @@ end
 local _bootErrors = {}
 
 local function _bootSection(name, fn)
-    print("[Rival Hub Boot] Iniciando:", name)
+    print("[Anciote Boot] Iniciando:", name)
     local ok, err = pcall(fn)
     if not ok then
-        print("[Rival Hub Boot] FALLÓ:", name, tostring(err))
+        print("[Anciote Boot] FALLÓ:", name, tostring(err))
         table.insert(_bootErrors, {name = name, err = tostring(err)})
-        warn("[Rival Hub Boot] Error en '" .. name .. "': " .. tostring(err))
+        warn("[Anciote Boot] Error en '" .. name .. "': " .. tostring(err))
     else
-        print("[Rival Hub Boot] OK:", name)
+        print("[Anciote Boot] OK:", name)
     end
     return ok
 end
@@ -10408,9 +10408,9 @@ if gui and main then
         end)
     end
 
-    _bootSection("localizeRivalHubInterface", function()
-        if gui then localizeRivalHubInterface(gui) end
-        if MobilePanel then localizeRivalHubInterface(MobilePanel) end
+    _bootSection("localizeAncioteInterface", function()
+        if gui then localizeAncioteInterface(gui) end
+        if MobilePanel then localizeAncioteInterface(MobilePanel) end
     end)
 
     if LP.Character then
@@ -10433,12 +10433,12 @@ if gui and main then
                 local env = (getgenv and getgenv()) or _G
                 local writeFn = env.writefile or (syn and syn.writefile)
                 if type(writeFn) == "function" then
-                    local log = "[Rival Hub Boot Errors] " .. os.date("%Y-%m-%d %H:%M:%S") .. "\n"
+                    local log = "[Anciote Boot Errors] " .. os.date("%Y-%m-%d %H:%M:%S") .. "\n"
                     for _, e in ipairs(_bootErrors) do
                         log = log .. e.name .. ": " .. e.err .. "\n"
                     end
-                    pcall(writeFn, "RivalHub_boot_errors.txt", log)
-                    warn("[Rival Hub] Errores escritos a RivalHub_boot_errors.txt")
+                    pcall(writeFn, "Anciote_boot_errors.txt", log)
+                    warn("[Anciote] Errores escritos a Anciote_boot_errors.txt")
                 end
             end)
         end)
@@ -10446,7 +10446,7 @@ if gui and main then
         task.defer(function()
             pcall(function()
                 local errGui = Instance.new("ScreenGui")
-                errGui.Name = "RivalHubBootErrors"
+                errGui.Name = "AncioteBootErrors"
                 errGui.ResetOnSpawn = false
                 errGui.DisplayOrder = 999
                 local okCg, cg = pcall(function() return game:GetService("CoreGui") end)
@@ -10469,7 +10469,7 @@ if gui and main then
                 title.Size = UDim2.new(1, -20, 0, 24)
                 title.Position = UDim2.new(0, 10, 0, 8)
                 title.BackgroundTransparency = 1
-                title.Text = "⚠ Rival Hub: " .. #_bootErrors .. " sección(es) fallaron"
+                title.Text = "⚠ Anciote: " .. #_bootErrors .. " sección(es) fallaron"
                 title.TextColor3 = Color3.fromRGB(255, 100, 110)
                 title.Font = Enum.Font.GothamBold
                 title.TextSize = 13
@@ -10531,7 +10531,7 @@ if gui and main then
         end)
     end
 else
-    warn("[Rival Hub Boot] Fatal: buildGui falló. El script no puede continuar.")
+    warn("[Anciote Boot] Fatal: buildGui falló. El script no puede continuar.")
 end
 
 if LP and LP.CharacterAdded then
@@ -10661,11 +10661,11 @@ UIS.InputBegan:Connect(function(input, gpe)
         return
     end
     if kbMatch(KB.BatV2, kc) then
-        if _G.__RivalHubIsBatV2 and _G.__RivalHubIsBatV2() then
-            if _G.__RivalHubStopBatV2 then pcall(_G.__RivalHubStopBatV2) end
+        if _G.__AncioteIsBatV2 and _G.__AncioteIsBatV2() then
+            if _G.__AncioteStopBatV2 then pcall(_G.__AncioteStopBatV2) end
             if mobSetBatV2 then mobSetBatV2(false) end
         else
-            if _G.__RivalHubStartBatV2 then pcall(_G.__RivalHubStartBatV2) end
+            if _G.__AncioteStartBatV2 then pcall(_G.__AncioteStartBatV2) end
             if mobSetBatV2 then mobSetBatV2(true) end
         end
         return
@@ -10779,12 +10779,12 @@ do
             return true
         end
 
-        local arrival = TS:Create(strip, TweenInfo.new(0.52, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+        local arAnciote = TS:Create(strip, TweenInfo.new(0.52, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
             Position = UDim2.fromScale(0.5, 0.12)
         })
         TS:Create(scale, TweenInfo.new(0.52, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Scale = 1}):Play()
-        arrival:Play()
-        arrival.Completed:Wait()
+        arAnciote:Play()
+        arAnciote.Completed:Wait()
         if abortIfReleased() then return end
 
         local revealTime = 1.9
